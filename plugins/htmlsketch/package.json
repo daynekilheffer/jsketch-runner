@@ -1,0 +1,19 @@
+{
+  "name": "jsketch-runner-htmlsketch-plugin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx rollup -c",
+    "build:watch": "npx rollup -c -w"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@brainly/html-sketchapp": "^4.3.0",
+    "normalize-css-color": "^1.0.2",
+    "rollup": "^1.21.2",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0"
+  }
+}
