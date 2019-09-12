@@ -13,9 +13,17 @@ const builder = createBuilder()
 builder
   .build()
   .plugin(htmlsketch)
-  .process('https://material-ui.com/components/switches/', async (jsketch) => {
+  .process('https://r203n.csb.app/', async (jsketch) => {
+    await jsketch.page(async page => page.waitFor('.MuiSwitch-root'))
+
     const singleLayers = await jsketch.createLayers('.MuiSwitch-root', (_, idx) => idx === 0)
     singleLayers.forEach(layer => page.addLayer(layer))
+    
+    await jsketch.page(async page => {
+      const elem = (await page.$$('.MuiSwitch-root'))[0]
+      // await elem.click()
+      await elem.hover()
+    })
 
     const multipleLayers = await jsketch.createLayers('.MuiSwitch-root', (_, idx) => idx < 5)
     multipleLayers.forEach(layer => page.addLayer(layer))

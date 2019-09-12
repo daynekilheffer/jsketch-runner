@@ -4,7 +4,8 @@
   "description": "",
   "main": "lib",
   "scripts": {
-    "test": "node tester.js && unzip test.sketch -d unpackaged",
+    "test": "node tester.js",
+    "unpack": "unzip test.sketch -d unpackaged",
     "compile": "npx rollup -c",
     "sketch": "npm run compile && node ."
   },
