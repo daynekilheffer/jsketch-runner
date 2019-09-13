@@ -1,11 +1,9 @@
 const normalizeColor = require('normalize-css-color')
 
+const UnknownLayer = require('./unknown-layer')
+
 const walkLayers = (layers, selector, fn) => {
-  let workingSet = layers
-  if (!Array.isArray(layers)) {
-    workingSet = [layers]
-  }
-  workingSet.forEach(layer => {
+  layers.forEach(layer => {
     selector(layer) && fn(layer)
     layer.layers && walkLayers(layer.layers, selector, fn)
   })
@@ -80,6 +78,13 @@ const clearRectPoints = (layers) => {
 }
 
 module.exports = (layer) => {
-  cleanText(layer)
-  clearRectPoints(layer)
+  let workspace = layer
+  if (!Array.isArray(layer)) {
+    workspace = [layer]
+  }
+  cleanText(workspace)
+  clearRectPoints(workspace)
+
+  const wrapperLayers = workspace.map(layer => new UnknownLayer(layer))
+  return Array.isArray(layer) ? wrapperLayers : wrapperLayers[0]
 }

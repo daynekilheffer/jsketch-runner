@@ -2,8 +2,10 @@ const fs = require('fs')
 const createBuilder = require('.')
 const htmlsketch = require('./plugins/htmlsketch')
 
-const { File, Page, fileToZip } = require('jsketch')
+const { File, Page, SymbolMaster, fileToZip } = require('jsketch')
 
+const symbolPage = new Page()
+symbolPage.name = 'Symbols'
 const page = new Page()
 page.name = 'Page'
 const file = new File()
@@ -16,9 +18,11 @@ builder
   .process('https://r203n.csb.app/', async (jsketch) => {
     await jsketch.page(async page => page.waitFor('.MuiSwitch-root'))
 
-    const singleLayers = await jsketch.createLayers('.MuiSwitch-root', (_, idx) => idx === 0)
-    singleLayers.forEach(layer => page.addLayer(layer))
-    
+    const singleLayer = await jsketch.createLayers('.MuiSwitch-root', (_, idx) => idx === 0)
+
+    singleLayer.forEach(layer => page.addLayer(layer))
+    // const symbol = await jsketch.createSymbol('.MuiSwitch')
+
     await jsketch.page(async page => {
       const elem = (await page.$$('.MuiSwitch-root'))[0]
       // await elem.click()
@@ -26,7 +30,10 @@ builder
     })
 
     const multipleLayers = await jsketch.createLayers('.MuiSwitch-root', (_, idx) => idx < 5)
-    multipleLayers.forEach(layer => page.addLayer(layer))
+    multipleLayers.forEach(layer => {
+      layer.y += 40
+      page.addLayer(layer)
+    })
   })
   .run()
   .then(() => {
