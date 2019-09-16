@@ -10,7 +10,7 @@ const UnknownLayer = function (json) {
   containment.width = json.frame.width
   containment.height = json.frame.height
   containment.name = json.name
-  json.layers.forEach(layer => {
+  json.layers && json.layers.forEach(layer => {
     containment.addLayer(new UnknownLayer(layer))
   })
 
@@ -23,6 +23,9 @@ const UnknownLayer = function (json) {
         })
       }
       const response = Reflect.get(target, property, target)
+      if (typeof response === 'function') {
+        return () => containment.toJSON()
+      }
       return response !== undefined ? response : store[property]
     },
     set: function (target, property, value) {

@@ -21,7 +21,6 @@
   page.evaluate('jsketch.bootstrap(`${JSON.stringify(config)}`)')
   ```
 
-1. how is the symbol and image storage accessed/used?
 1. can a plugin or processing function change viewport?
   - does it ever reset?
   - can the same processing be done for all viewports?

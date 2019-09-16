@@ -10,7 +10,10 @@ const page = new Page()
 page.name = 'Page'
 const file = new File()
 
+const symboldb = new Map()
+
 const builder = createBuilder()
+builder.symboldb(symboldb)
 
 builder
   .build()
@@ -18,26 +21,40 @@ builder
   .process('https://r203n.csb.app/', async (jsketch) => {
     await jsketch.page(async page => page.waitFor('.MuiSwitch-root'))
 
-    const singleLayer = await jsketch.createLayers('.MuiSwitch-root', (_, idx) => idx === 0)
+    const [ singleLayer ] = await jsketch.createLayers('.MuiSwitch-root', (_, idx) => idx === 2)
 
-    singleLayer.forEach(layer => page.addLayer(layer))
-    // const symbol = await jsketch.createSymbol('.MuiSwitch')
+    const master = new SymbolMaster()
+    master.name = 'muiswitch'
+    master.width = singleLayer.width
+    master.height = singleLayer.height
+    singleLayer.x = 0
+    singleLayer.y = 0
+    master.addLayer(singleLayer)
 
-    await jsketch.page(async page => {
-      const elem = (await page.$$('.MuiSwitch-root'))[0]
-      // await elem.click()
-      await elem.hover()
-    })
+    symbolPage.addLayer(master)
+    symboldb.set(singleLayer.name, master)
 
-    const multipleLayers = await jsketch.createLayers('.MuiSwitch-root', (_, idx) => idx < 5)
-    multipleLayers.forEach(layer => {
-      layer.y += 40
-      page.addLayer(layer)
-    })
+    // await jsketch.page(async page => {
+    //   const elem = (await page.$$('.MuiSwitch-root'))[0]
+    //   // await elem.click()
+    //   await elem.hover()
+    // })
+
+    // const multipleLayers = await jsketch.createLayers('.MuiSwitch-root', (_, idx) => idx < 2)
+    // multipleLayers.forEach(layer => {
+    //   layer.y += 40
+    //   page.addLayer(layer)
+    // })
+  })
+  .process('https://5rwen.csb.app/', async (jsketch) => {
+    await jsketch.page(async page => page.waitFor('.MuiFormControlLabel-root'))
+    const layers = await jsketch.createLayers('.MuiFormControlLabel-root')
+    layers.forEach(layer => page.addLayer(layer))
   })
   .run()
   .then(() => {
     file.document.addPage(page)
+    file.document.addPage(symbolPage)
     fileToZip(file)
       .pipe(fs.createWriteStream('test.sketch'))
   })
