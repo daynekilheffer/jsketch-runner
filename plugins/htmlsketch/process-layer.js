@@ -8,70 +8,72 @@ const visitLayers = (layers, parent, selector, fn) => {
     layer.layers && visitLayers(layer.layers, layer, selector, fn)
   })
 }
-const walkLayers = (layers, selector, fn) => {
-  layers.forEach(layer => {
-    selector(layer) && fn(layer)
-    visitLayers(layer.layers, layer, selector, fn)
-  })
-}
 
-const cleanText = (layers) => {
-  walkLayers(layers, layer => layer._class === 'text', currentLayer => {
-    const text = currentLayer.text
-    const colorStr = currentLayer.style.color
+const cleanText = (layer) => {
+  visitLayers(
+    layer.layers,
+    layer,
+    layer => layer._class === 'text',
+    currentLayer => {
+      const text = currentLayer.text
+      const colorStr = currentLayer.style.color
 
-    const nullableColor = normalizeColor(colorStr);
-    const colorInt = nullableColor === null ? 0x00000000 : nullableColor;
-    const {red, green, blue, alpha} = normalizeColor.rgba(colorInt);
+      const nullableColor = normalizeColor(colorStr);
+      const colorInt = nullableColor === null ? 0x00000000 : nullableColor;
+      const {red, green, blue, alpha} = normalizeColor.rgba(colorInt);
 
-    const attributes = {
-      MSAttributedStringFontAttribute: {
-        _class: 'fontDescriptor',
-        attributes: { name: currentLayer.style.fontFamily, size: currentLayer.style.fontSize }
-      },
-    }
+      const attributes = {
+        MSAttributedStringFontAttribute: {
+          _class: 'fontDescriptor',
+          attributes: { name: currentLayer.style.fontFamily, size: currentLayer.style.fontSize }
+        },
+      }
 
-    currentLayer.attributedString = {
-      _class: 'attributedString',
-      string: text,
-      attributes: [
-        {
-          _class: 'stringAttribute',
-          location: 0,
-          length: text.length,
-          attributes,
-        }
-      ]
-    }
-    currentLayer.style = {
-      _class: 'style',
-      endMarkerType: 0,
-      miterLimit: 10,
-      startMarkerType: 0,
-      textStyle: {
-        _class: 'textStyle',
-        encodedAttributes: attributes,
-      },
-      fills: [
-        {
-          _class: 'fill',
-          isEnabled: true,
-          color: {
-            _class: 'color',
-            alpha: alpha === undefined ? 1 : alpha,
-            blue,
-            green,
-            red,
+      currentLayer.attributedString = {
+        _class: 'attributedString',
+        string: text,
+        attributes: [
+          {
+            _class: 'stringAttribute',
+            location: 0,
+            length: text.length,
+            attributes,
           }
-        }
-      ]
+        ]
+      }
+      currentLayer.style = {
+        _class: 'style',
+        endMarkerType: 0,
+        miterLimit: 10,
+        startMarkerType: 0,
+        textStyle: {
+          _class: 'textStyle',
+          encodedAttributes: attributes,
+        },
+        fills: [
+          {
+            _class: 'fill',
+            isEnabled: true,
+            color: {
+              _class: 'color',
+              alpha: alpha === undefined ? 1 : alpha,
+              blue,
+              green,
+              red,
+            }
+          }
+        ]
+      }
     }
-  })
+  )
+  return layer
 }
 
 
-const clearRectPoints = (layers) => {
-  walkLayers(layers,
+const clearRectPoints = (layer) => {
+  visitLayers(
+    layer.layers,
+    layer,
     layer => layer._class === 'rectangle',
     currentLayer => {
       Object.keys(currentLayer.path).filter(key => key !== '_class')
@@ -81,6 +83,7 @@ const clearRectPoints = (layers) => {
       delete currentLayer.path
     }
   )
+  return layer
 }
 
 const createInstances = symboldb =>
@@ -107,10 +110,10 @@ module.exports = (layer, { symboldb }) => {
   if (!Array.isArray(layer)) {
     workspace = [layer]
   }
-  cleanText(workspace)
-  clearRectPoints(workspace)
 
   const wrapperLayers = workspace
+    .map(cleanText)
+    .map(clearRectPoints)
     .map(layer => new UnknownLayer(layer))
     .map(createInstances(symboldb))
 
