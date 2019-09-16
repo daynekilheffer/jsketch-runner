@@ -2,12 +2,14 @@ const fs = require('fs')
 const createBuilder = require('.')
 const htmlsketch = require('./plugins/htmlsketch')
 
-const { File, Page, SymbolMaster, fileToZip } = require('jsketch')
+const { File, Page, Artboard, SymbolMaster, fileToZip } = require('jsketch')
 
 const symbolPage = new Page()
 symbolPage.name = 'Symbols'
 const page = new Page()
 page.name = 'Page'
+const artboard = new Artboard.Desktop()
+page.addLayer(artboard)
 const file = new File()
 
 const symboldb = new Map()
@@ -49,7 +51,7 @@ builder
   .process('https://5rwen.csb.app/', async (jsketch) => {
     await jsketch.page(async page => page.waitFor('.MuiFormControlLabel-root'))
     const layers = await jsketch.createLayers('.MuiFormControlLabel-root')
-    layers.forEach(layer => page.addLayer(layer))
+    layers.forEach(layer => artboard.addLayer(layer))
   })
   .run()
   .then(() => {
