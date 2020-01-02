@@ -1,7 +1,7 @@
 {
-  "name": "jsketch-scoir",
+  "name": "jsketch-runner",
   "version": "1.0.0",
-  "description": "",
+  "description": "jsketch runner for processing a page",
   "main": "lib",
   "scripts": {
     "test": "node tester.js",
@@ -14,13 +14,13 @@
   "license": "ISC",
   "dependencies": {
     "async": "^3.1.0",
-    "puppeteer": "^1.19.0",
-    "rollup": "^1.20.0",
-    "rollup-plugin-commonjs": "^10.0.2",
+    "puppeteer": "^2.0.0",
+    "rollup": "^1.27.14",
+    "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",
-    "eslint": "^6.3.0"
+    "eslint": "^6.8.0"
   }
 }
