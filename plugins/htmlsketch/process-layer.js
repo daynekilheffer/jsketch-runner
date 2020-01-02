@@ -105,10 +105,14 @@ const createInstances = symboldb =>
     return layer
   }
 
+const unwrapIdentity = i => i
+const unwrapHead = i => i[0]
 module.exports = (layer, { symboldb }) => {
   let workspace = layer
+  let unwrap = unwrapIdentity
   if (!Array.isArray(layer)) {
     workspace = [layer]
+    unwrap = unwrapHead
   }
 
   const wrapperLayers = workspace
@@ -117,5 +121,5 @@ module.exports = (layer, { symboldb }) => {
     .map(layer => new UnknownLayer(layer))
     .map(createInstances(symboldb))
 
-  return Array.isArray(layer) ? wrapperLayers : wrapperLayers[0]
+  return unwrap(wrapperLayers)
 }
